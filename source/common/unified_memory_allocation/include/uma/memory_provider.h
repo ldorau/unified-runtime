@@ -12,6 +12,31 @@
 #include <uma/base.h>
 #include <uma/memory_provider_ops.h>
 
+#define UMA_ATTR_NORMAL 0          /* No further special treatment.  */
+#define UMA_ATTR_RANDOM 1          /* Expect random page references.  */
+#define UMA_ATTR_SEQUENTIAL 2      /* Expect sequential page references.  */
+#define UMA_ATTR_WILLNEED 3        /* Will need these pages.  */
+#define UMA_ATTR_DONTNEED 4        /* Don't need these pages.  */
+#define UMA_ATTR_FREE 8            /* Free pages only if memory pressure.  */
+#define UMA_ATTR_REMOVE 9          /* Remove these pages and resources.  */
+#define UMA_ATTR_DONTFORK 10       /* Do not inherit across fork.  */
+#define UMA_ATTR_DOFORK 11         /* Do inherit across fork.  */
+#define UMA_ATTR_MERGEABLE 12      /* KSM may merge identical pages.  */
+#define UMA_ATTR_UNMERGEABLE 13    /* KSM may not merge identical pages.  */
+#define UMA_ATTR_HUGEPAGE 14       /* Worth backing with hugepages.  */
+#define UMA_ATTR_NOHUGEPAGE 15     /* Not worth backing with hugepages.  */
+#define UMA_ATTR_DONTDUMP 16       /* Explicity exclude from the core dump, */
+                                   /* overrides the coredump filter bits.  */
+#define UMA_ATTR_DODUMP 17         /* Clear the UMA_ATTR_DONTDUMP flag.  */
+#define UMA_ATTR_WIPEONFORK 18     /* Zero memory on fork, child only.  */
+#define UMA_ATTR_KEEPONFORK 19     /* Undo UMA_ATTR_WIPEONFORK.  */
+#define UMA_ATTR_COLD 20           /* Deactivate these pages.  */
+#define UMA_ATTR_PAGEOUT 21        /* Reclaim these pages.  */
+#define UMA_ATTR_POPULATE_READ 22  /* Populate (prefault) page tables */
+                                   /* readable. */
+#define UMA_ATTR_POPULATE_WRITE 23 /* Populate (prefault) page tables */
+                                   /* writable. */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -81,6 +106,17 @@ enum uma_result_t umaMemoryProviderFree(uma_memory_provider_handle_t hProvider,
 enum uma_result_t
 umaMemoryProviderGetLastResult(uma_memory_provider_handle_t hProvider,
                                const char **ppMessage);
+
+///
+/// \brief Set attributes of the memory space pointed by ptr from the memory provider
+/// \param hProvider handle to the memory provider
+/// \param ptr pointer to the allocated memory
+/// \param size size of the allocation
+/// \param attrs attributes of the memory space to be set
+///
+enum uma_result_t
+umaMemoryProviderSetAttributes(uma_memory_provider_handle_t hProvider,
+                               void *ptr, size_t size, int attrs);
 
 #ifdef __cplusplus
 }

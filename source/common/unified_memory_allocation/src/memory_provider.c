@@ -64,3 +64,9 @@ umaMemoryProviderGetLastResult(uma_memory_provider_handle_t hProvider,
                                const char **ppMessage) {
     return hProvider->ops.get_last_result(hProvider->provider_priv, ppMessage);
 }
+
+enum uma_result_t
+umaMemoryProviderSetAttributes(uma_memory_provider_handle_t hProvider,
+                               void *ptr, size_t size, int attrs) {
+    return hProvider->ops.set_attrs(hProvider->provider_priv, ptr, size, attrs);
+}
