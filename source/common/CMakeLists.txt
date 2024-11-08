@@ -9,6 +9,14 @@ if (UR_BUILD_ADAPTER_L0 OR UR_BUILD_ADAPTER_L0_V2)
     set(UMF_LEVEL_ZERO_INCLUDE_DIR "${LEVEL_ZERO_INCLUDE_DIR}" CACHE INTERNAL "Level Zero headers")
 endif()
 
+if(UR_BUILD_ADAPTER_CUDA)
+    include(FetchCUDA)
+    set(UMF_BUILD_CUDA_PROVIDER ON CACHE INTERNAL "Build UMF CUDA provider")
+    set(UMF_CUDA_INCLUDE_DIR "${CUDA_INCLUDE_DIR}" CACHE INTERNAL "CUDA headers")
+else()
+    set(UMF_BUILD_CUDA_PROVIDER OFF CACHE INTERNAL "Build UMF CUDA provider")
+endif()
+
 add_ur_library(ur_common STATIC
     ur_util.cpp
     ur_util.hpp
@@ -53,7 +61,6 @@ set(UMF_BUILD_TESTS OFF CACHE INTERNAL "Build UMF tests")
 set(UMF_BUILD_EXAMPLES OFF CACHE INTERNAL "Build UMF examples")
 set(UMF_BUILD_SHARED_LIBRARY ${UMF_BUILD_SHARED_LIBRARY} CACHE INTERNAL "Build UMF shared library")
 set(UMF_BUILD_LIBUMF_POOL_DISJOINT ON CACHE INTERNAL "Build Disjoint Pool")
-set(UMF_BUILD_CUDA_PROVIDER OFF CACHE INTERNAL "Build UMF CUDA provider")
 
 FetchContent_MakeAvailable(unified-memory-framework)
 FetchContent_GetProperties(unified-memory-framework)
