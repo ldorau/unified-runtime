@@ -15,6 +15,9 @@
 
 usm::DisjointPoolAllConfigs InitializeDisjointPoolConfig();
 
+// Add ur_usm_provider_handle_t_ here ???
+// struct ur_usm_provider_handle_t_ {
+
 struct ur_usm_pool_handle_t_ {
   std::atomic_uint32_t RefCount = 1;
 
