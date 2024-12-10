@@ -428,6 +428,9 @@ ur_usm_pool_handle_t_::ur_usm_pool_handle_t_(ur_context_handle_t Context,
                         .second;
     Context->addPool(this);
   }
+
+  // initialize the CUDA provider here ???
+
 }
 
 bool ur_usm_pool_handle_t_::hasUMFPool(umf_memory_pool_t *umf_pool) {

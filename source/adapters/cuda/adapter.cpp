@@ -20,6 +20,8 @@ struct ur_adapter_handle_t_ {
   struct cuda_tracing_context_t_ *TracingCtx = nullptr;
   logger::Logger &logger;
   ur_adapter_handle_t_();
+
+  // add CUDA provider here ???
 };
 
 class ur_legacy_sink : public logger::Sink {
