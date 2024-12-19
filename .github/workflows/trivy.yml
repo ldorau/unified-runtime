@@ -4,10 +4,6 @@ name: Trivy
 on:
   workflow_dispatch:
   push:
-  pull_request:
-    paths:
-      - '.github/docker/*Dockerfile'
-      - '.github/workflows/trivy.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}

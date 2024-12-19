@@ -1,7 +1,7 @@
 ---
 name: Examples - Adapters on Level Zero HW
 
-on: [push, pull_request]
+on: [push]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}

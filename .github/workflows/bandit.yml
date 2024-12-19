@@ -1,7 +1,7 @@
 # Runs bandit security checker for code written in Python.
 name: Bandit
 
-on: [push, pull_request, workflow_dispatch]
+on: [push, workflow_dispatch]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
