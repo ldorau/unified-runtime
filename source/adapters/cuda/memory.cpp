@@ -51,11 +51,8 @@ UR_APIEXPORT ur_result_t UR_APICALL urMemBufferCreate(
       AllocMode = BufferMem::AllocMode::UseHostPtr;
     } else if (flags & UR_MEM_FLAG_ALLOC_HOST_POINTER) {
       // UR_CHECK_ERROR(cuMemAllocHost(&HostPtr, size));
-      std::vector<ur_device_handle_t> Devices = hContext->getDevices();
-      ur_device_handle_t Device0 = Devices[0];
       umf_memory_provider_handle_t umfCUDAprovider =
-          Device0->getUmfCUDAprovider(
-              umf_usm_memory_type_t::UMF_MEMORY_TYPE_HOST);
+          hContext->memoryProviderHost;
       umf_result_t umf_result =
           umfMemoryProviderAlloc(umfCUDAprovider, size, 0, &HostPtr);
       UR_CHECK_ERROR(umf::umf2urResult(umf_result));
@@ -451,8 +448,7 @@ ur_result_t allocateMemObjOnDeviceIfNeeded(ur_mem_handle_t Mem,
     } else {
       // UR_CHECK_ERROR(cuMemAlloc(&DevPtr, Buffer.Size));
       umf_memory_provider_handle_t umfCUDAprovider =
-          hDevice->getUmfCUDAprovider(
-              umf_usm_memory_type_t::UMF_MEMORY_TYPE_DEVICE);
+          hDevice->memoryProviderDevice;
       umf_result_t umf_result = umfMemoryProviderAlloc(
           umfCUDAprovider, Buffer.Size, 0, (void **)&DevPtr);
       UR_CHECK_ERROR(umf::umf2urResult(umf_result));

@@ -132,40 +132,20 @@ urPlatformGet(ur_adapter_handle_t *, uint32_t, uint32_t NumEntries,
               CUdevice device = device_handle->get();
               CUcontext context = device_handle->getNativeContext();
 
-              for (int memType = UMF_MEMORY_TYPE_HOST;
-                   memType <= UMF_MEMORY_TYPE_SHARED; memType++) {
-                umf_result = umfCUDAMemoryProviderParamsSetContext(
-                    cu_memory_provider_params, context);
-                if (umf_result != UMF_RESULT_SUCCESS) {
-                  Result = umf::umf2urResult(umf_result);
-                  throw Result;
-                }
+              umf_result = umf::createUmfCUDAprovider(
+                  cu_memory_provider_params, device, context,
+                  UMF_MEMORY_TYPE_DEVICE, &device_handle->memoryProviderDevice);
+              if (umf_result != UMF_RESULT_SUCCESS) {
+                Result = umf::umf2urResult(umf_result);
+                throw Result;
+              }
 
-                umf_result = umfCUDAMemoryProviderParamsSetDevice(
-                    cu_memory_provider_params, device);
-                if (umf_result != UMF_RESULT_SUCCESS) {
-                  Result = umf::umf2urResult(umf_result);
-                  throw Result;
-                }
-
-                umf_result = umfCUDAMemoryProviderParamsSetMemoryType(
-                    cu_memory_provider_params, (umf_usm_memory_type_t)memType);
-                if (umf_result != UMF_RESULT_SUCCESS) {
-                  Result = umf::umf2urResult(umf_result);
-                  throw Result;
-                }
-
-                umf_memory_provider_handle_t umfCUDAprovider = nullptr;
-                umf_result = umfMemoryProviderCreate(umfCUDAMemoryProviderOps(),
-                                                     cu_memory_provider_params,
-                                                     &umfCUDAprovider);
-                if (umf_result != UMF_RESULT_SUCCESS) {
-                  Result = umf::umf2urResult(umf_result);
-                  throw Result;
-                }
-
-                device_handle->setUmfCUDAprovider(
-                    (umf_usm_memory_type_t)memType, umfCUDAprovider);
+              umf_result = umf::createUmfCUDAprovider(
+                  cu_memory_provider_params, device, context,
+                  UMF_MEMORY_TYPE_SHARED, &device_handle->memoryProviderShared);
+              if (umf_result != UMF_RESULT_SUCCESS) {
+                Result = umf::umf2urResult(umf_result);
+                throw Result;
               }
             }
 
