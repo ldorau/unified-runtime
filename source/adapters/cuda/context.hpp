@@ -19,6 +19,7 @@
 
 #include "common.hpp"
 #include "device.hpp"
+#include "umf_helpers.hpp"
 
 #include <umf/memory_pool.h>
 
@@ -74,6 +75,29 @@ typedef void (*ur_context_extended_deleter_t)(void *user_data);
 ///  if necessary.
 ///
 ///
+
+static ur_result_t
+CreateHostMemoryProvider(ur_device_handle_t_ *DeviceHandle,
+                         umf_memory_provider_handle_t *MemoryProviderHost) {
+  CUcontext context = DeviceHandle->getNativeContext();
+
+  umf_cuda_memory_provider_params_handle_t CUMemoryProviderParams = nullptr;
+
+  umf_result_t umf_result =
+      umfCUDAMemoryProviderParamsCreate(&CUMemoryProviderParams);
+  UMF_RETURN_UR_ERROR(umf_result);
+
+  // create UMF CUDA memory provider for the host memory (UMF_MEMORY_TYPE_HOST)
+  umf_result = umf::createMemoryProvider(
+      CUMemoryProviderParams, 0 /* cuDevice */, context, UMF_MEMORY_TYPE_HOST,
+      MemoryProviderHost);
+  UMF_RETURN_UR_ERROR(umf_result);
+
+  umfCUDAMemoryProviderParamsDestroy(CUMemoryProviderParams);
+
+  return UR_RESULT_SUCCESS;
+}
+
 struct ur_context_handle_t_ {
 
   struct deleter_data {
@@ -86,14 +110,26 @@ struct ur_context_handle_t_ {
   std::vector<ur_device_handle_t> Devices;
   std::atomic_uint32_t RefCount;
 
+  // UMF CUDA memory provider for the host memory (UMF_MEMORY_TYPE_HOST)
+  umf_memory_provider_handle_t MemoryProviderHost;
+
   ur_context_handle_t_(const ur_device_handle_t *Devs, uint32_t NumDevices)
       : Devices{Devs, Devs + NumDevices}, RefCount{1} {
     for (auto &Dev : Devices) {
       urDeviceRetain(Dev);
     }
+
+    // Create UMF CUDA memory provider for the host memory
+    // (UMF_MEMORY_TYPE_HOST) from any device (Devices[0] is used here, because
+    // it is guaranteed to exist).
+    MemoryProviderHost = nullptr;
+    UR_CHECK_ERROR(CreateHostMemoryProvider(Devices[0], &MemoryProviderHost));
   };
 
   ~ur_context_handle_t_() {
+    if (MemoryProviderHost) {
+      umfMemoryProviderDestroy(MemoryProviderHost);
+    }
     for (auto &Dev : Devices) {
       urDeviceRelease(Dev);
     }

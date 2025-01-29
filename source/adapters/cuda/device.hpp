@@ -11,6 +11,8 @@
 
 #include <ur/ur.hpp>
 
+#include <umf/memory_provider.h>
+
 #include "common.hpp"
 
 struct ur_device_handle_t_ {
@@ -81,7 +83,15 @@ public:
     UR_CHECK_ERROR(cuDeviceTotalMem(&MaxAllocSize, cuDevice));
   }
 
-  ~ur_device_handle_t_() { cuDevicePrimaryCtxRelease(CuDevice); }
+  ~ur_device_handle_t_() {
+    if (MemoryProviderDevice) {
+      umfMemoryProviderDestroy(MemoryProviderDevice);
+    }
+    if (MemoryProviderShared) {
+      umfMemoryProviderDestroy(MemoryProviderShared);
+    }
+    cuDevicePrimaryCtxRelease(CuDevice);
+  }
 
   native_type get() const noexcept { return CuDevice; };
 
@@ -117,6 +127,12 @@ public:
 
   // bookkeeping for mipmappedArray leaks in Mapping external Memory
   std::map<CUarray, CUmipmappedArray> ChildCuarrayFromMipmapMap;
+
+  // UMF CUDA memory provider for the device memory (UMF_MEMORY_TYPE_DEVICE)
+  umf_memory_provider_handle_t MemoryProviderDevice = nullptr;
+
+  // UMF CUDA memory provider for the shared memory (UMF_MEMORY_TYPE_SHARED)
+  umf_memory_provider_handle_t MemoryProviderShared = nullptr;
 };
 
 int getAttribute(ur_device_handle_t Device, CUdevice_attribute Attribute);

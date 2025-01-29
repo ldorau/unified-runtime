@@ -16,6 +16,7 @@
 #include <umf/memory_pool_ops.h>
 #include <umf/memory_provider.h>
 #include <umf/memory_provider_ops.h>
+#include <umf/providers/provider_cuda.h>
 #include <ur_api.h>
 
 #include "logger/ur_logger.hpp"
@@ -26,6 +27,20 @@
 #include <stdexcept>
 #include <tuple>
 #include <utility>
+
+#define UMF_RETURN_UMF_ERROR(umf_result)                                       \
+  do {                                                                         \
+    if (umf_result != UMF_RESULT_SUCCESS) {                                    \
+      return umf_result;                                                       \
+    }                                                                          \
+  } while (0)
+
+#define UMF_RETURN_UR_ERROR(umf_result)                                        \
+  do {                                                                         \
+    if (umf_result != UMF_RESULT_SUCCESS) {                                    \
+      return umf::umf2urResult(umf_result);                                    \
+    }                                                                          \
+  } while (0)
 
 namespace umf {
 
@@ -277,6 +292,33 @@ inline ur_result_t umf2urResult(umf_result_t umfResult) {
   default:
     return UR_RESULT_ERROR_UNKNOWN;
   };
+}
+
+inline umf_result_t createMemoryProvider(
+    umf_cuda_memory_provider_params_handle_t CUMemoryProviderParams,
+    int cuDevice, void *cuContext, umf_usm_memory_type_t memType,
+    umf_memory_provider_handle_t *provider) {
+
+  umf_result_t umf_result =
+      umfCUDAMemoryProviderParamsSetContext(CUMemoryProviderParams, cuContext);
+  UMF_RETURN_UMF_ERROR(umf_result);
+
+  umf_result =
+      umfCUDAMemoryProviderParamsSetDevice(CUMemoryProviderParams, cuDevice);
+  UMF_RETURN_UMF_ERROR(umf_result);
+
+  umf_result =
+      umfCUDAMemoryProviderParamsSetMemoryType(CUMemoryProviderParams, memType);
+  UMF_RETURN_UMF_ERROR(umf_result);
+
+  umf_memory_provider_handle_t umfCUDAprovider = nullptr;
+  umf_result = umfMemoryProviderCreate(
+      umfCUDAMemoryProviderOps(), CUMemoryProviderParams, &umfCUDAprovider);
+  UMF_RETURN_UMF_ERROR(umf_result);
+
+  *provider = umfCUDAprovider;
+
+  return UMF_RESULT_SUCCESS;
 }
 
 } // namespace umf
