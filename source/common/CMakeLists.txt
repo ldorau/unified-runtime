@@ -28,15 +28,12 @@ target_include_directories(ur_common PUBLIC
 
 message(STATUS "Download Unified Memory Framework from github.com")
 if (NOT DEFINED UMF_REPO)
-    set(UMF_REPO "https://github.com/oneapi-src/unified-memory-framework.git")
+    set(UMF_REPO "https://github.com/ldorau/unified-memory-framework.git")
 endif()
 
 if (NOT DEFINED UMF_TAG)
-    # commit 6709535de92933d6bfc1e1d19a324f17afec3877
-    # Author: Rafał Rudnicki <rafal.rudnicki@intel.com>
-    # Date:   Mon Jan 27 10:57:57 2025 +0100
-    # Merge pull request #1056 from lukaszstolarczuk/hwloc-revert-examples-win
-    set(UMF_TAG 6709535de92933d6bfc1e1d19a324f17afec3877)
+    # Set CMAKE_BUILD_TYPE=UMF_CMAKE_BUILD_TYPE
+    set(UMF_TAG UR-mom-32-tag)
 endif()
 
 message(STATUS "Will fetch Unified Memory Framework from ${UMF_REPO}")
@@ -66,6 +63,7 @@ else()
   set(UMF_BUILD_SHARED_LIBRARY ${UMF_BUILD_SHARED_LIBRARY} CACHE INTERNAL "Build UMF shared library")
   set(UMF_BUILD_LIBUMF_POOL_DISJOINT ON CACHE INTERNAL "Build Disjoint Pool")
   set(UMF_BUILD_CUDA_PROVIDER ON CACHE INTERNAL "Build UMF CUDA provider")
+  set(UMF_CMAKE_BUILD_TYPE Debug CACHE INTERNAL "UMF_CMAKE_BUILD_TYPE")
 
   FetchContent_MakeAvailable(unified-memory-framework)
   FetchContent_GetProperties(unified-memory-framework)
