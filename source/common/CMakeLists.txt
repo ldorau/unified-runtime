@@ -40,11 +40,11 @@ if (NOT DEFINED UMF_REPO)
 endif()
 
 if (NOT DEFINED UMF_TAG)
-    # commit 6709535de92933d6bfc1e1d19a324f17afec3877
+    # commit ace9f4a60b686463fdad15cd016c548237cb79e0
     # Author: Rafał Rudnicki <rafal.rudnicki@intel.com>
-    # Date:   Mon Jan 27 10:57:57 2025 +0100
-    # Merge pull request #1056 from lukaszstolarczuk/hwloc-revert-examples-win
-    set(UMF_TAG 6709535de92933d6bfc1e1d19a324f17afec3877)
+    # Date:   Mon Feb 10 11:39:15 2025 +0100
+    # Merge pull request #1088 from ldorau/Fix_remove_CUDA_ERROR_INVALID_RESOURCE_TYPE
+    set(UMF_TAG ace9f4a60b686463fdad15cd016c548237cb79e0)
 endif()
 
 message(STATUS "Will fetch Unified Memory Framework from ${UMF_REPO}")
